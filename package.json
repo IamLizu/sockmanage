@@ -1,6 +1,6 @@
 {
     "name": "socketmaster",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "A utility to manage one socket per user with Redis persistence for scalable WebSocket applications.",
     "main": "dist/SocketMaster.js",
     "types": "dist/SocketMaster.d.ts",
