@@ -6,6 +6,8 @@
     -   Add `extractUserId` method (private): Parses and validates `userId` from incoming data, throwing an error if `userId` is missing.
     -   Add `handleExistingConnection` method (private): Checks and disconnects existing sockets for a user, ensuring only one active connection.
     -   Add `saveUserSocketsToRedis` method (private): Manages Redis persistence of active user sockets, updating data after each connection change.
+-   Add jsdoc comments to all methods
+-   Add example in class documentation
 
 ## v1.0.0 - Initial Release
 
