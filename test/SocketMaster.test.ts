@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 import { Namespace, Socket, Server as SocketIOServer } from "socket.io";
-import { SocketManager } from "../src/SocketManager";
+import { SocketMaster } from "../src/SocketMaster";
 
 jest.mock("redis", () => ({
     createClient: jest.fn().mockReturnValue({
@@ -20,11 +20,11 @@ jest.mock("socket.io", () => ({
     }),
 }));
 
-describe("SocketManager", () => {
+describe("SocketMaster", () => {
     let redisClient: any;
     let io: SocketIOServer;
     let namespace: Namespace;
-    let socketManager: SocketManager;
+    let socketMaster: SocketMaster;
     let consoleErrorMock: jest.SpyInstance;
 
     beforeAll(() => {
@@ -37,7 +37,7 @@ describe("SocketManager", () => {
         redisClient = createClient();
         io = new SocketIOServer();
         namespace = io.of("/");
-        socketManager = new SocketManager({ redis: redisClient });
+        socketMaster = new SocketMaster({ redis: redisClient });
     });
 
     afterAll(() => {
@@ -46,10 +46,10 @@ describe("SocketManager", () => {
 
     describe("setup", () => {
         it("should set up the io and namespace", () => {
-            socketManager.setup({ io, namespace: "/test" });
+            socketMaster.setup({ io, namespace: "/test" });
 
-            expect(socketManager["io"]).toBe(io);
-            expect(socketManager["namespace"]).toBe(namespace);
+            expect(socketMaster["io"]).toBe(io);
+            expect(socketMaster["namespace"]).toBe(namespace);
         });
     });
 
@@ -59,9 +59,9 @@ describe("SocketManager", () => {
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            await socketManager.initializeUserSockets();
+            await socketMaster.initializeUserSockets();
 
-            expect(socketManager["userSockets"].get("user1")).toBe("socket1");
+            expect(socketMaster["userSockets"].get("user1")).toBe("socket1");
         });
     });
 
@@ -71,7 +71,7 @@ describe("SocketManager", () => {
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            const result = await socketManager.getUserSockets();
+            const result = await socketMaster.getUserSockets();
 
             expect(result?.get("user1")).toBe("socket1");
         });
@@ -79,7 +79,7 @@ describe("SocketManager", () => {
         it("should return null if Redis data is invalid", async () => {
             redisClient.get.mockResolvedValue("invalid data");
 
-            const result = await socketManager.getUserSockets();
+            const result = await socketMaster.getUserSockets();
 
             expect(result).toBeNull();
         });
@@ -91,7 +91,7 @@ describe("SocketManager", () => {
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            const result = await socketManager.getUserSocket("user1");
+            const result = await socketMaster.getUserSocket("user1");
 
             expect(result).toBe("socket1");
         });
@@ -99,7 +99,7 @@ describe("SocketManager", () => {
         it("should return null if the user does not exist", async () => {
             redisClient.get.mockResolvedValue(null);
 
-            const result = await socketManager.getUserSocket("user1");
+            const result = await socketMaster.getUserSocket("user1");
 
             expect(result).toBeNull();
         });
@@ -110,9 +110,9 @@ describe("SocketManager", () => {
             const socket = { id: "socket1" } as Socket;
             const data = JSON.stringify({ userId: "user1" });
 
-            await socketManager.registerSocketForUser(socket, data);
+            await socketMaster.registerSocketForUser(socket, data);
 
-            expect(socketManager["userSockets"].get("user1")).toBe("socket1");
+            expect(socketMaster["userSockets"].get("user1")).toBe("socket1");
             expect(redisClient.set).toHaveBeenCalledWith(
                 "userSockets",
                 JSON.stringify([["user1", "socket1"]])
@@ -120,7 +120,7 @@ describe("SocketManager", () => {
         });
 
         it("should disconnect existing socket if a new one is registered", async () => {
-            socketManager.setup({ io, namespace: "/test" });
+            socketMaster.setup({ io, namespace: "/test" });
 
             const existingSocket = {
                 id: "socket1",
@@ -132,12 +132,12 @@ describe("SocketManager", () => {
             const socket = { id: "socket2" } as Socket;
             const data = JSON.stringify({ userId: "user1" });
 
-            socketManager["userSockets"].set("user1", "socket1");
+            socketMaster["userSockets"].set("user1", "socket1");
 
-            await socketManager.registerSocketForUser(socket, data);
+            await socketMaster.registerSocketForUser(socket, data);
 
             expect(existingSocket.disconnect).toHaveBeenCalledWith(true);
-            expect(socketManager["userSockets"].get("user1")).toBe("socket2");
+            expect(socketMaster["userSockets"].get("user1")).toBe("socket2");
         });
     });
 
@@ -148,11 +148,11 @@ describe("SocketManager", () => {
                 data: { userId: "user1" },
             } as unknown as Socket;
 
-            socketManager["userSockets"].set("user1", "socket1");
+            socketMaster["userSockets"].set("user1", "socket1");
 
-            socketManager.deRegisterSocketForUser(socket);
+            socketMaster.deRegisterSocketForUser(socket);
 
-            expect(socketManager["userSockets"].has("user1")).toBe(false);
+            expect(socketMaster["userSockets"].has("user1")).toBe(false);
         });
     });
 
@@ -162,9 +162,9 @@ describe("SocketManager", () => {
             const _event = "testEvent";
             const data = { message: "test" };
 
-            socketManager.setup({ io, namespace: "/test" });
+            socketMaster.setup({ io, namespace: "/test" });
 
-            socketManager.informSocket({
+            socketMaster.informSocket({
                 socketId,
                 _event,
                 data,
