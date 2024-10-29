@@ -17,7 +17,7 @@ interface InformSocketOptions {
     data: any;
 }
 
-export class SocketMaster {
+export class SockManage {
     private userSockets: Map<string, string> = new Map();
     private redis: RedisClientType;
     private io!: SocketIOServer;
