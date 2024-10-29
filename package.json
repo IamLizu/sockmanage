@@ -1,0 +1,37 @@
+{
+    "name": "socketmanager",
+    "version": "0.0.0",
+    "description": "A utility to manage one socket per user with Redis persistence for scalable WebSocket applications.",
+    "main": "dist/SocketManager.js",
+    "types": "dist/SocketManager.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/IamLizu/socketmanager.git"
+    },
+    "author": "S M Mahmudul Hasan <he@smmahmudulhasan.com>",
+    "license": "MIT",
+    "keywords": [
+        "socket",
+        "Redis",
+        "user-sockets",
+        "WebSockets"
+    ],
+    "dependencies": {
+        "redis": "^4.7.0",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.14",
+        "@types/node": "^22.8.2",
+        "@types/redis-mock": "^0.17.3",
+        "jest": "^29.7.0",
+        "redis-mock": "^0.56.3",
+        "ts-jest": "^29.2.5",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.6.3"
+    }
+}
