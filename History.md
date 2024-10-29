@@ -14,8 +14,9 @@
     -   `getUserSocket` is now `getSocket`
     -   `registerSocketForUser` is now `register`
     -   `deRegisterSocketForUser` is now `deregister`
-    -   `informSocket` remains as `inform` (or rename based on judgment)
+    -   `informSocket` remains as `inform`
 -   **Deprecated**: Original method names remain for backward compatibility but will be removed in future versions. Using these names now triggers a warning.
+-   Add missing use of `initialize` method
 
 ## v1.0.0 - Initial Release
 
