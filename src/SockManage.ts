@@ -1,5 +1,5 @@
-import { RedisClientType } from "redis";
-import { Namespace, Socket, Server as SocketIOServer } from "socket.io";
+import { RedisClientType } from 'redis';
+import { Namespace, Socket, Server as SocketIOServer } from 'socket.io';
 
 interface SocketManagerOptions {
     redis: RedisClientType;
@@ -29,11 +29,11 @@ export class SockManage {
 
     setup({ io, namespace }: SetupOptions): void {
         this.io = io;
-        this.namespace = namespace ? this.io.of(namespace) : this.io.of("/");
+        this.namespace = namespace ? this.io.of(namespace) : this.io.of('/');
     }
 
     async initializeUserSockets(): Promise<void> {
-        let userSockets = await this.redis.get("userSockets");
+        let userSockets = await this.redis.get('userSockets');
 
         if (userSockets) {
             this.userSockets = new Map(JSON.parse(userSockets));
@@ -42,14 +42,14 @@ export class SockManage {
 
     async getUserSockets(): Promise<Map<string, string> | null> {
         try {
-            let userSockets = await this.redis.get("userSockets");
+            let userSockets = await this.redis.get('userSockets');
 
             if (userSockets) {
                 try {
                     return new Map(JSON.parse(userSockets));
                 } catch (error) {
                     console.error(
-                        "Failed to parse userSockets from Redis:",
+                        'Failed to parse userSockets from Redis:',
                         error
                     );
 
@@ -59,7 +59,7 @@ export class SockManage {
 
             return null;
         } catch (error) {
-            console.error("Error retrieving userSockets from Redis:", error);
+            console.error('Error retrieving userSockets from Redis:', error);
 
             return null;
         }
@@ -72,33 +72,50 @@ export class SockManage {
     }
 
     async registerSocketForUser(socket: Socket, data: string): Promise<void> {
-        const { userId } = JSON.parse(data);
+        const userId = this.extractUserId(data);
 
-        if (!userId || !socket.id) {
-            console.warn("Invalid socket or user data:", {
-                userId,
-                socketId: socket.id,
-            });
-            return;
+        if (!userId) {
+            throw new Error('userId not found in data, it is required!');
         }
 
-        const existingSocketId = this.userSockets.get(userId);
-
-        if (existingSocketId && existingSocketId !== socket.id) {
-            const existingSocket = this.namespace.sockets.get(existingSocketId);
-
-            existingSocket?.disconnect(true); // Disconnect existing socket if still connected
-        }
+        await this.handleExistingConnection(userId, socket);
 
         this.userSockets.set(userId, socket.id);
+        await this.saveUserSocketsToRedis();
+    }
 
+    private extractUserId(data: string): string | null {
+        try {
+            const parsedData = JSON.parse(data);
+
+            return parsedData.userId || null;
+        } catch (error) {
+            console.error('Failed to parse user data:', error);
+            return null;
+        }
+    }
+
+    private async handleExistingConnection(
+        userId: string,
+        newSocket: Socket
+    ): Promise<void> {
+        const existingSocketId = this.userSockets.get(userId);
+
+        if (existingSocketId && existingSocketId !== newSocket.id) {
+            const existingSocket = this.namespace.sockets.get(existingSocketId);
+
+            existingSocket?.disconnect(true);
+        }
+    }
+
+    private async saveUserSocketsToRedis(): Promise<void> {
         try {
             await this.redis.set(
-                "userSockets",
+                'userSockets',
                 JSON.stringify(Array.from(this.userSockets.entries()))
             );
         } catch (error) {
-            console.error("Failed to persist user socket in Redis:", error);
+            console.error('Failed to persist user sockets in Redis:', error);
         }
     }
 
@@ -112,7 +129,7 @@ export class SockManage {
     }
 
     informSocket({
-        namespace = "/",
+        namespace = '/',
         socketId,
         _event,
         data,
