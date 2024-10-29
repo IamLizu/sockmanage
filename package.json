@@ -1,16 +1,16 @@
 {
-    "name": "socketmanager",
-    "version": "1.0.0",
+    "name": "socketmaster",
+    "version": "0.0.0",
     "description": "A utility to manage one socket per user with Redis persistence for scalable WebSocket applications.",
-    "main": "dist/SocketManager.js",
-    "types": "dist/SocketManager.d.ts",
+    "main": "dist/SocketMaster.js",
+    "types": "dist/SocketMaster.d.ts",
     "scripts": {
         "build": "tsc",
         "test": "jest"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/IamLizu/socketmanager.git"
+        "url": "https://github.com/IamLizu/socketmaster.git"
     },
     "author": "S M Mahmudul Hasan <he@smmahmudulhasan.com>",
     "license": "MIT",

@@ -1,6 +1,6 @@
-# SocketManager
+# SocketMaster
 
-SocketManager is a utility library for managing WebSocket connections, ensuring each user has a single active socket connection at any given time. It uses Redis for persistence, making it suitable for scalable and distributed WebSocket applications.
+SocketMaster is a utility library for managing WebSocket connections, ensuring each user has a single active socket connection at any given time. It uses Redis for persistence, making it suitable for scalable and distributed WebSocket applications.
 
 ## Features
 
@@ -14,13 +14,13 @@ SocketManager is a utility library for managing WebSocket connections, ensuring 
 To install with npm:
 
 ```
-npm install socketmanager
+npm install socketmaster
 ```
 
 or with Yarn:
 
 ```
-yarn add socketmanager
+yarn add socketmaster
 ```
 
 ## Usage
@@ -30,17 +30,17 @@ yarn add socketmanager
 ```typescript
 import { createClient } from "redis";
 import { Server as SocketIOServer } from "socket.io";
-import { SocketManager } from "socketmanager";
+import { SocketMaster } from "socketmaster";
 
 // Initialize Redis and Socket.IO
 const redisClient = createClient();
 const io = new SocketIOServer(server); // assume 'server' is an HTTP server
 
-// Initialize SocketManager
-const socketManager = new SocketManager({ redis: redisClient });
+// Initialize SocketMaster
+const socketMaster = new SocketMaster({ redis: redisClient });
 
 // Set up the Socket.IO server and specify the namespace (optional)
-socketManager.setup({ io, namespace: "/your-namespace" });
+socketMaster.setup({ io, namespace: "/your-namespace" });
 ```
 
 ### Methods
@@ -50,7 +50,7 @@ socketManager.setup({ io, namespace: "/your-namespace" });
 Sets up Socket.IO server and optional namespace.
 
 ```typescript
-socketManager.setup({ io, namespace: "/your-namespace" });
+socketMaster.setup({ io, namespace: "/your-namespace" });
 ```
 
 **Parameters:**
@@ -63,7 +63,7 @@ socketManager.setup({ io, namespace: "/your-namespace" });
 Initializes user sockets from Redis.
 
 ```typescript
-await socketManager.initializeUserSockets();
+await socketMaster.initializeUserSockets();
 ```
 
 #### `getUserSockets`
@@ -71,7 +71,7 @@ await socketManager.initializeUserSockets();
 Retrieves all user sockets from Redis.
 
 ```typescript
-const userSockets = await socketManager.getUserSockets();
+const userSockets = await socketMaster.getUserSockets();
 ```
 
 **Returns:** `Promise<Map<string, string> | null>`: A map of user IDs to socket IDs, or `null` if retrieval fails.
@@ -81,7 +81,7 @@ const userSockets = await socketManager.getUserSockets();
 Retrieves the socket ID for a specific user.
 
 ```typescript
-const socketId = await socketManager.getUserSocket("userId");
+const socketId = await socketMaster.getUserSocket("userId");
 ```
 
 **Parameters:**
@@ -95,7 +95,7 @@ const socketId = await socketManager.getUserSocket("userId");
 Registers a socket for a user and ensures only one active socket per user.
 
 ```typescript
-await socketManager.registerSocketForUser(
+await socketMaster.registerSocketForUser(
     socket,
     JSON.stringify({ userId: "user1" })
 );
@@ -111,7 +111,7 @@ await socketManager.registerSocketForUser(
 Deregisters a socket for a user.
 
 ```typescript
-socketManager.deRegisterSocketForUser(socket);
+socketMaster.deRegisterSocketForUser(socket);
 ```
 
 **Parameters:**
@@ -123,7 +123,7 @@ socketManager.deRegisterSocketForUser(socket);
 Emits an event to a specific socket.
 
 ```typescript
-socketManager.informSocket({
+socketMaster.informSocket({
     socketId: "socket1",
     _event: "message",
     data: { message: "Hello, User!" },
@@ -141,26 +141,26 @@ socketManager.informSocket({
 ```typescript
 import { createClient } from "redis";
 import { Server as SocketIOServer } from "socket.io";
-import { SocketManager } from "socketmanager";
+import { SocketMaster } from "socketmaster";
 
 const redisClient = createClient();
 const io = new SocketIOServer(server);
 
-const socketManager = new SocketManager({ redis: redisClient });
-socketManager.setup({ io });
+const socketMaster = new SocketMaster({ redis: redisClient });
+socketMaster.setup({ io });
 
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
 
-    socketManager.registerSocketForUser(socket, JSON.stringify({ userId }));
+    socketMaster.registerSocketForUser(socket, JSON.stringify({ userId }));
 
     socket.on("disconnect", () => {
-        socketManager.deRegisterSocketForUser(socket);
+        socketMaster.deRegisterSocketForUser(socket);
     });
 
     // this following block is completely optional, you shall proceed with using your own event sending logic
     socket.on("message", (data) => {
-        socketManager.informSocket({
+        socketMaster.informSocket({
             socketId: socket.id,
             _event: "message",
             data: { message: "Hello, User!" },
