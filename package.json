@@ -1,6 +1,6 @@
 {
     "name": "socketmanager",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "A utility to manage one socket per user with Redis persistence for scalable WebSocket applications.",
     "main": "dist/SocketManager.js",
     "types": "dist/SocketManager.d.ts",
