@@ -36,6 +36,9 @@ interface InformSocketOptions {
  * const socketManager = new SockManage({ redis: redisClient });
  * socketManager.setup({ io, namespace: "/chat" });
  *
+ * // Assuming top-level await is supported, otherwise wrap the following line in an async function
+ * await socketManager.initialize();
+ *
  * io.on("connection", (socket) => {
  *     // You be getting the userId from anywhere, it doesn't matter where you get it from
  *     // as long as you pass it to the register method.

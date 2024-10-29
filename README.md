@@ -41,6 +41,9 @@ const socketManager = new SockManage({ redis: redisClient });
 
 // Set up the Socket.IO server and specify the namespace (optional)
 socketManager.setup({ io, namespace: '/your-namespace' });
+
+// Assuming top-level await is supported, otherwise wrap the following line in an async function
+await socketManager.initialize();
 ```
 
 ### Methods
@@ -106,7 +109,7 @@ await socketManager.register(socket, JSON.stringify({ userId: 'user1' }));
 
 #### `deRegister`
 
-Deregisters a socket for a user.
+De-registers a socket for a user.
 
 ```typescript
 socketManager.deRegister(socket);
@@ -146,6 +149,9 @@ const io = new SocketIOServer(server);
 
 const socketManager = new SockManage({ redis: redisClient });
 socketManager.setup({ io });
+
+// Assuming top-level await is supported, otherwise wrap the following line in an async function
+await socketManager.initialize();
 
 io.on('connection', (socket) => {
     // You be getting the userId from anywhere, it doesn't matter where you get it from
