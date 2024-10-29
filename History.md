@@ -1,6 +1,6 @@
 # History
 
-## Unreleased
+## v1.0.1
 
 -   Clean `registerSocketForUser` method
     -   Add `extractUserId` method (private): Parses and validates `userId` from incoming data, throwing an error if `userId` is missing.
