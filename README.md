@@ -28,9 +28,9 @@ yarn add sockmanage
 ### Importing and Setting Up
 
 ```typescript
-import { createClient } from "redis";
-import { Server as SocketIOServer } from "socket.io";
-import { SockManage } from "sockmanage";
+import { createClient } from 'redis';
+import { Server as SocketIOServer } from 'socket.io';
+import { SockManage } from 'sockmanage';
 
 // Initialize Redis and Socket.IO
 const redisClient = createClient();
@@ -40,7 +40,7 @@ const io = new SocketIOServer(server); // assume 'server' is an HTTP server
 const socketManager = new SockManage({ redis: redisClient });
 
 // Set up the Socket.IO server and specify the namespace (optional)
-socketManager.setup({ io, namespace: "/your-namespace" });
+socketManager.setup({ io, namespace: '/your-namespace' });
 ```
 
 ### Methods
@@ -50,7 +50,7 @@ socketManager.setup({ io, namespace: "/your-namespace" });
 Sets up Socket.IO server and optional namespace.
 
 ```typescript
-socketManager.setup({ io, namespace: "/your-namespace" });
+socketManager.setup({ io, namespace: '/your-namespace' });
 ```
 
 **Parameters:**
@@ -58,30 +58,30 @@ socketManager.setup({ io, namespace: "/your-namespace" });
 -   `io`: Instance of `SocketIOServer`.
 -   `namespace` (optional): Namespace for Socket.IO events.
 
-#### `initializeUserSockets`
+#### `initialize`
 
 Initializes user sockets from Redis.
 
 ```typescript
-await socketManager.initializeUserSockets();
+await socketManager.initialize();
 ```
 
-#### `getUserSockets`
+#### `getSockets`
 
 Retrieves all user sockets from Redis.
 
 ```typescript
-const userSockets = await socketManager.getUserSockets();
+const userSockets = await socketManager.getSockets();
 ```
 
 **Returns:** `Promise<Map<string, string> | null>`: A map of user IDs to socket IDs, or `null` if retrieval fails.
 
-#### `getUserSocket`
+#### `getSocket`
 
 Retrieves the socket ID for a specific user.
 
 ```typescript
-const socketId = await socketManager.getUserSocket("userId");
+const socketId = await socketManager.getSocket('userId');
 ```
 
 **Parameters:**
@@ -90,15 +90,13 @@ const socketId = await socketManager.getUserSocket("userId");
 
 **Returns:** `Promise<string | null>`: Socket ID of the user or `null` if not found.
 
-#### `registerSocketForUser`
+#### `register`
 
-Registers a socket for a user and ensures only one active socket per user.
+Registers a socket for a user and ensures only one active socket per user.  
+**Note:** The `data` parameter must be a JSON string containing the `userId`.
 
 ```typescript
-await socketManager.registerSocketForUser(
-    socket,
-    JSON.stringify({ userId: "user1" })
-);
+await socketManager.register(socket, JSON.stringify({ userId: 'user1' }));
 ```
 
 **Parameters:**
@@ -106,27 +104,27 @@ await socketManager.registerSocketForUser(
 -   `socket`: The socket instance.
 -   `data`: A JSON string containing the `userId`.
 
-#### `deRegisterSocketForUser`
+#### `deRegister`
 
 Deregisters a socket for a user.
 
 ```typescript
-socketManager.deRegisterSocketForUser(socket);
+socketManager.deRegister(socket);
 ```
 
 **Parameters:**
 
 -   `socket`: The socket instance to deregister.
 
-#### `informSocket`
+#### `inform`
 
 Emits an event to a specific socket.
 
 ```typescript
-socketManager.informSocket({
-    socketId: "socket1",
-    _event: "message",
-    data: { message: "Hello, User!" },
+socketManager.inform({
+    socketId: 'socket1',
+    _event: 'message',
+    data: { message: 'Hello, User!' },
 });
 ```
 
@@ -139,9 +137,9 @@ socketManager.informSocket({
 ## Example
 
 ```typescript
-import { createClient } from "redis";
-import { Server as SocketIOServer } from "socket.io";
-import { SockManage } from "sockmanage";
+import { createClient } from 'redis';
+import { Server as SocketIOServer } from 'socket.io';
+import { SockManage } from 'sockmanage';
 
 const redisClient = createClient();
 const io = new SocketIOServer(server);
@@ -149,21 +147,23 @@ const io = new SocketIOServer(server);
 const socketManager = new SockManage({ redis: redisClient });
 socketManager.setup({ io });
 
-io.on("connection", (socket) => {
+io.on('connection', (socket) => {
+    // You be getting the userId from anywhere, it doesn't matter where you get it from
+    // as long as you pass it to the register method.
     const userId = socket.handshake.query.userId;
 
-    socketManager.registerSocketForUser(socket, JSON.stringify({ userId }));
+    socketManager.register(socket, JSON.stringify({ userId }));
 
-    socket.on("disconnect", () => {
-        socketManager.deRegisterSocketForUser(socket);
+    socket.on('disconnect', () => {
+        socketManager.deRegister(socket);
     });
 
     // this following block is completely optional, you shall proceed with using your own event sending logic
-    socket.on("message", (data) => {
-        socketManager.informSocket({
+    socket.on('message', (data) => {
+        socketManager.inform({
             socketId: socket.id,
-            _event: "message",
-            data: { message: "Hello, User!" },
+            _event: 'message',
+            data: { message: 'Hello, User!' },
         });
     });
 });

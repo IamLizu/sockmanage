@@ -8,6 +8,14 @@
     -   Add `saveUserSocketsToRedis` method (private): Manages Redis persistence of active user sockets, updating data after each connection change.
 -   Add jsdoc comments to all methods
 -   Add example in class documentation
+-   Shortened public method names for simplicity:
+    -   `initializeUserSockets` is now `initialize`
+    -   `getUserSockets` is now `getSockets`
+    -   `getUserSocket` is now `getSocket`
+    -   `registerSocketForUser` is now `register`
+    -   `deRegisterSocketForUser` is now `deregister`
+    -   `informSocket` remains as `inform` (or rename based on judgment)
+-   **Deprecated**: Original method names remain for backward compatibility but will be removed in future versions. Using these names now triggers a warning.
 
 ## v1.0.0 - Initial Release
 

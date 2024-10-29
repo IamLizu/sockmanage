@@ -53,25 +53,25 @@ describe('SockManage', () => {
         });
     });
 
-    describe('initializeUserSockets', () => {
+    describe('initialize', () => {
         it('should initialize user sockets from Redis', async () => {
             const userSockets = JSON.stringify([['user1', 'socket1']]);
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            await socketManager.initializeUserSockets();
+            await socketManager.initialize();
 
             expect(socketManager['userSockets'].get('user1')).toBe('socket1');
         });
     });
 
-    describe('getUserSockets', () => {
+    describe('getSockets', () => {
         it('should return user sockets from Redis', async () => {
             const userSockets = JSON.stringify([['user1', 'socket1']]);
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            const result = await socketManager.getUserSockets();
+            const result = await socketManager.getSockets();
 
             expect(result?.get('user1')).toBe('socket1');
         });
@@ -79,19 +79,19 @@ describe('SockManage', () => {
         it('should return null if Redis data is invalid', async () => {
             redisClient.get.mockResolvedValue('invalid data');
 
-            const result = await socketManager.getUserSockets();
+            const result = await socketManager.getSockets();
 
             expect(result).toBeNull();
         });
     });
 
-    describe('getUserSocket', () => {
+    describe('getSocket', () => {
         it('should return the socket ID for a given user', async () => {
             const userSockets = JSON.stringify([['user1', 'socket1']]);
 
             redisClient.get.mockResolvedValue(userSockets);
 
-            const result = await socketManager.getUserSocket('user1');
+            const result = await socketManager.getSocket('user1');
 
             expect(result).toBe('socket1');
         });
@@ -99,27 +99,27 @@ describe('SockManage', () => {
         it('should return null if the user does not exist', async () => {
             redisClient.get.mockResolvedValue(null);
 
-            const result = await socketManager.getUserSocket('user1');
+            const result = await socketManager.getSocket('user1');
 
             expect(result).toBeNull();
         });
     });
 
-    describe('registerSocketForUser', () => {
+    describe('register', () => {
         it('should throw an error if userId is not found in data', async () => {
             const socket = {} as Socket;
             const data = JSON.stringify({});
 
-            await expect(
-                socketManager.registerSocketForUser(socket, data)
-            ).rejects.toThrow('userId not found in data, it is required!');
+            await expect(socketManager.register(socket, data)).rejects.toThrow(
+                'userId not found in data, it is required!'
+            );
         });
 
         it('should register a socket for a user', async () => {
             const socket = { id: 'socket1' } as Socket;
             const data = JSON.stringify({ userId: 'user1' });
 
-            await socketManager.registerSocketForUser(socket, data);
+            await socketManager.register(socket, data);
 
             expect(socketManager['userSockets'].get('user1')).toBe('socket1');
             expect(redisClient.set).toHaveBeenCalledWith(
@@ -143,14 +143,14 @@ describe('SockManage', () => {
 
             socketManager['userSockets'].set('user1', 'socket1');
 
-            await socketManager.registerSocketForUser(socket, data);
+            await socketManager.register(socket, data);
 
             expect(existingSocket.disconnect).toHaveBeenCalledWith(true);
             expect(socketManager['userSockets'].get('user1')).toBe('socket2');
         });
     });
 
-    describe('deRegisterSocketForUser', () => {
+    describe('deRegister', () => {
         it('should deregister a socket for a user', () => {
             const socket = {
                 id: 'socket1',
@@ -159,13 +159,13 @@ describe('SockManage', () => {
 
             socketManager['userSockets'].set('user1', 'socket1');
 
-            socketManager.deRegisterSocketForUser(socket);
+            socketManager.deRegister(socket);
 
             expect(socketManager['userSockets'].has('user1')).toBe(false);
         });
     });
 
-    describe('informSocket', () => {
+    describe('inform', () => {
         it('should inform a socket with an event and data', () => {
             const socketId = 'socket1';
             const _event = 'testEvent';
@@ -173,7 +173,7 @@ describe('SockManage', () => {
 
             socketManager.setup({ io, namespace: '/test' });
 
-            socketManager.informSocket({
+            socketManager.inform({
                 socketId,
                 _event,
                 data,
