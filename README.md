@@ -28,9 +28,9 @@ yarn add sockmanage
 ### Importing and Setting Up
 
 ```typescript
-import { createClient } from 'redis';
-import { Server as SocketIOServer } from 'socket.io';
-import { SockManage } from 'sockmanage';
+import { createClient } from "redis";
+import { Server as SocketIOServer } from "socket.io";
+import { SockManage } from "sockmanage";
 
 // Initialize Redis and Socket.IO
 const redisClient = createClient();
@@ -40,7 +40,7 @@ const io = new SocketIOServer(server); // assume 'server' is an HTTP server
 const socketManager = new SockManage({ redis: redisClient });
 
 // Set up the Socket.IO server and specify the namespace (optional)
-socketManager.setup({ io, namespace: '/your-namespace' });
+socketManager.setup({ io, namespace: "/your-namespace" });
 
 // Assuming top-level await is supported, otherwise wrap the following line in an async function
 await socketManager.initialize();
@@ -53,7 +53,7 @@ await socketManager.initialize();
 Sets up Socket.IO server and optional namespace.
 
 ```typescript
-socketManager.setup({ io, namespace: '/your-namespace' });
+socketManager.setup({ io, namespace: "/your-namespace" });
 ```
 
 **Parameters:**
@@ -71,27 +71,27 @@ await socketManager.initialize();
 
 #### `getSockets`
 
-Retrieves all user sockets from Redis.
+Retrieves all user sockets from local map.
 
 ```typescript
-const userSockets = await socketManager.getSockets();
+const userSockets = socketManager.getSockets();
 ```
 
-**Returns:** `Promise<Map<string, string> | null>`: A map of user IDs to socket IDs, or `null` if retrieval fails.
+**Returns:** `Map<string, string>`: A map of user IDs to socket IDs, or an empty map.
 
 #### `getSocket`
 
 Retrieves the socket ID for a specific user.
 
 ```typescript
-const socketId = await socketManager.getSocket('userId');
+const socketId = socketManager.getSocket("userId");
 ```
 
 **Parameters:**
 
 -   `userId`: ID of the user.
 
-**Returns:** `Promise<string | null>`: Socket ID of the user or `null` if not found.
+**Returns:** `string | null`: Socket ID of the user or `null` if not found.
 
 #### `register`
 
@@ -99,7 +99,7 @@ Registers a socket for a user and ensures only one active socket per user.
 **Note:** The `data` parameter must be a JSON string containing the `userId`.
 
 ```typescript
-await socketManager.register(socket, JSON.stringify({ userId: 'user1' }));
+await socketManager.register(socket, JSON.stringify({ userId: "user1" }));
 ```
 
 **Parameters:**
@@ -125,9 +125,9 @@ Emits an event to a specific socket.
 
 ```typescript
 socketManager.inform({
-    socketId: 'socket1',
-    _event: 'message',
-    data: { message: 'Hello, User!' },
+    socketId: "socket1",
+    _event: "message",
+    data: { message: "Hello, User!" },
 });
 ```
 
@@ -140,9 +140,9 @@ socketManager.inform({
 ## Example
 
 ```typescript
-import { createClient } from 'redis';
-import { Server as SocketIOServer } from 'socket.io';
-import { SockManage } from 'sockmanage';
+import { createClient } from "redis";
+import { Server as SocketIOServer } from "socket.io";
+import { SockManage } from "sockmanage";
 
 const redisClient = createClient();
 const io = new SocketIOServer(server);
@@ -153,23 +153,23 @@ socketManager.setup({ io });
 // Assuming top-level await is supported, otherwise wrap the following line in an async function
 await socketManager.initialize();
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
     // You be getting the userId from anywhere, it doesn't matter where you get it from
     // as long as you pass it to the register method.
     const userId = socket.handshake.query.userId;
 
     socketManager.register(socket, JSON.stringify({ userId }));
 
-    socket.on('disconnect', () => {
+    socket.on("disconnect", () => {
         socketManager.deRegister(socket);
     });
 
     // this following block is completely optional, you shall proceed with using your own event sending logic
-    socket.on('message', (data) => {
+    socket.on("message", (data) => {
         socketManager.inform({
             socketId: socket.id,
-            _event: 'message',
-            data: { message: 'Hello, User!' },
+            _event: "message",
+            data: { message: "Hello, User!" },
         });
     });
 });
