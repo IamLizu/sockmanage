@@ -1,6 +1,6 @@
 # History
 
-## Unreleased
+## v1.0.3
 
 -   Fix `deRegister` method typo
 -   Add missing `LICENSE` file
