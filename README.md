@@ -183,6 +183,10 @@ To run the tests, use the following command:
 yarn test
 ```
 
+## Changelog
+
+Detailed changes for each version are documented in the [History.md](History.md) file.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.

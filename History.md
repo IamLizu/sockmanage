@@ -1,5 +1,11 @@
 # History
 
+## Unreleased
+
+-   Fix `deRegister` method typo
+-   Add missing `LICENSE` file
+-   Add link for History.md in README.md
+
 ## v1.0.2
 
 -   Refactor `getSockets` to return `this.userSockets` directly instead of using Redis.
@@ -18,7 +24,7 @@
     -   `getUserSockets` is now `getSockets`
     -   `getUserSocket` is now `getSocket`
     -   `registerSocketForUser` is now `register`
-    -   `deRegisterSocketForUser` is now `deregister`
+    -   `deRegisterSocketForUser` is now `deRegister`
     -   `informSocket` remains as `inform`
 -   **Deprecated**: Original method names remain for backward compatibility but will be removed in future versions. Using these names now triggers a warning.
 -   Add missing use of `initialize` method
