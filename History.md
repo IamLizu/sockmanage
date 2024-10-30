@@ -1,5 +1,10 @@
 # History
 
+## Unreleased
+
+-   Refactor `getSockets` to return `this.userSockets` directly instead of using Redis.
+-   Refactor `getSocket` to return `this.userSockets.get(userId)` directly instead of using Redis.
+
 ## v1.0.1
 
 -   Clean `registerSocketForUser` method

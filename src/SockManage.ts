@@ -1,6 +1,6 @@
-import { RedisClientType } from 'redis';
-import { Namespace, Socket, Server as SocketIOServer } from 'socket.io';
-import { deprecate } from 'util';
+import { RedisClientType } from "redis";
+import { Namespace, Socket, Server as SocketIOServer } from "socket.io";
+import { deprecate } from "util";
 
 interface SocketManagerOptions {
     redis: RedisClientType;
@@ -87,7 +87,7 @@ export class SockManage {
      */
     setup({ io, namespace }: SetupOptions): void {
         this.io = io;
-        this.namespace = namespace ? this.io.of(namespace) : this.io.of('/');
+        this.namespace = namespace ? this.io.of(namespace) : this.io.of("/");
     }
 
     /**
@@ -97,7 +97,7 @@ export class SockManage {
      * @returns {Promise<void>} A promise that resolves when the user sockets have been initialized.
      */
     async initialize(): Promise<void> {
-        let userSockets = await this.redis.get('userSockets');
+        let userSockets = await this.redis.get("userSockets");
 
         if (userSockets) {
             this.userSockets = new Map(JSON.parse(userSockets));
@@ -109,39 +109,16 @@ export class SockManage {
      */
     initializeUserSockets = deprecate(
         this.initialize,
-        'initializeUserSockets() is deprecated. Use initialize() instead.'
+        "initializeUserSockets() is deprecated. Use initialize() instead."
     );
 
     /**
-     * Retrieves the user sockets from Redis.
+     * Retrieves the map of user sockets.
      *
-     * @returns {Promise<Map<string, string> | null>} A promise that resolves to a Map of user sockets if available, or null if not found or an error occurs.
-     *
-     * @throws Will log an error message if there is an issue retrieving or parsing the user sockets from Redis.
+     * @returns {Map<string, string>} A map where the keys are user identifiers and the values are socket identifiers.
      */
-    async getSockets(): Promise<Map<string, string> | null> {
-        try {
-            let userSockets = await this.redis.get('userSockets');
-
-            if (userSockets) {
-                try {
-                    return new Map(JSON.parse(userSockets));
-                } catch (error) {
-                    console.error(
-                        'Failed to parse userSockets from Redis:',
-                        error
-                    );
-
-                    return null;
-                }
-            }
-
-            return null;
-        } catch (error) {
-            console.error('Error retrieving userSockets from Redis:', error);
-
-            return null;
-        }
+    getSockets(): Map<string, string> {
+        return this.userSockets;
     }
 
     /**
@@ -149,19 +126,17 @@ export class SockManage {
      */
     getUserSockets = deprecate(
         this.getSockets,
-        'getUserSockets() is deprecated. Use getSockets() instead.'
+        "getUserSockets() is deprecated. Use getSockets() instead."
     );
 
     /**
-     * Retrieves the socket ID associated with a given user ID.
+     * Retrieves the socket ID associated with a user.
      *
      * @param userId - The unique identifier of the user.
-     * @returns A promise that resolves to the socket ID as a string if found, or null if not found.
+     * @returns The socket ID if found, otherwise `null`.
      */
-    async getSocket(userId: string): Promise<string | null> {
-        const userSockets = await this.getSockets();
-
-        return userSockets ? userSockets.get(userId) || null : null;
+    getSocket(userId: string): string | null {
+        return this.userSockets.get(userId) || null;
     }
 
     /**
@@ -169,7 +144,7 @@ export class SockManage {
      */
     getUserSocket = deprecate(
         this.getSocket,
-        'getUserSocket() is deprecated. Use getSocket() instead.'
+        "getUserSocket() is deprecated. Use getSocket() instead."
     );
 
     /**
@@ -184,7 +159,7 @@ export class SockManage {
         const userId = this.extractUserId(data);
 
         if (!userId) {
-            throw new Error('userId not found in data, it is required!');
+            throw new Error("userId not found in data, it is required!");
         }
 
         await this.handleExistingConnection(userId, socket);
@@ -198,7 +173,7 @@ export class SockManage {
      */
     registerSocketForUser = deprecate(
         this.register,
-        'registerSocketForUser() is deprecated. Use register() instead.'
+        "registerSocketForUser() is deprecated. Use register() instead."
     );
 
     /**
@@ -214,7 +189,7 @@ export class SockManage {
 
             return parsedData.userId || null;
         } catch (error) {
-            console.error('Failed to parse user data:', error);
+            console.error("Failed to parse user data:", error);
             return null;
         }
     }
@@ -252,11 +227,11 @@ export class SockManage {
     private async saveUserSocketsToRedis(): Promise<void> {
         try {
             await this.redis.set(
-                'userSockets',
+                "userSockets",
                 JSON.stringify(Array.from(this.userSockets.entries()))
             );
         } catch (error) {
-            console.error('Failed to persist user sockets in Redis:', error);
+            console.error("Failed to persist user sockets in Redis:", error);
         }
     }
 
@@ -283,7 +258,7 @@ export class SockManage {
      */
     deRegisterSocketForUser = deprecate(
         this.deRegister,
-        'deRegisterSocketForUser() is deprecated. Use deRegister() instead.'
+        "deRegisterSocketForUser() is deprecated. Use deRegister() instead."
     );
 
     /**
@@ -297,7 +272,7 @@ export class SockManage {
      * @returns {void}
      */
     inform({
-        namespace = '/',
+        namespace = "/",
         socketId,
         _event,
         data,
@@ -310,6 +285,6 @@ export class SockManage {
      */
     informSocket = deprecate(
         this.inform,
-        'informSocket() is deprecated. Use inform() instead.'
+        "informSocket() is deprecated. Use inform() instead."
     );
 }
