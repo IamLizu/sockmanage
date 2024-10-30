@@ -1,6 +1,6 @@
 {
     "name": "sockmanage",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A utility to manage one socket per user with Redis persistence for scalable WebSocket applications.",
     "main": "dist/SockManage.js",
     "types": "dist/SockManage.d.ts",
