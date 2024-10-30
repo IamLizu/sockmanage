@@ -1,6 +1,6 @@
 # History
 
-## Unreleased
+## v1.0.2
 
 -   Refactor `getSockets` to return `this.userSockets` directly instead of using Redis.
 -   Refactor `getSocket` to return `this.userSockets.get(userId)` directly instead of using Redis.
