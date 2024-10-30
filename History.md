@@ -1,5 +1,11 @@
 # History
 
+## Unreleased
+
+-   Fix `deRegister` method typo
+-   Add missing `LICENSE` file
+-   Add link for History.md in README.md
+
 ## v1.0.2
 
 -   Refactor `getSockets` to return `this.userSockets` directly instead of using Redis.
